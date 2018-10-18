@@ -1,0 +1,26 @@
+{
+  "name": "supercmd",
+  "version": "0.0.0",
+  "description": "Super Command is a comandline toolkit to build CLI comands.",
+  "main": "app.js",
+  "scripts": {
+    "test": "firetest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.noname-media.com:Nodejs/supercmd.git"
+  },
+  "keywords": [
+    "cli",
+    "command",
+    "commander",
+    "shell",
+    "terminal",
+    "tty"
+  ],
+  "author": "Andi Heinkelein <andifeind@noname-media.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "firescript": "^0.5.0"
+  }
+}

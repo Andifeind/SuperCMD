@@ -1,0 +1,3 @@
+const SuperCommand = require('./SuperCommand').SuperCommand
+module.exports = new SuperCommand()
+module.exports.SuperCommand = SuperCommand

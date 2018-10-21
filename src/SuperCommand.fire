@@ -1,0 +1,46 @@
+import Colorfy from 'colorfy'
+
+export class SuperCommand
+  constructor ()
+    this.optionRegExp = /(-\w|--[\w-]+)(?:,\s*(-\w|--[\w-]+))?(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
+
+  cwd (workingDir)
+    this.workingDir = workingDir
+
+  usage (str)
+    this._usage = str
+    return this
+
+  description (str)
+    this._desc = str
+    return this
+
+  option (option, description, defaultValue, fn)
+    this._opts.push([option, description, defaultValue, fn])
+    const opt = this.optionRegExp.capture({
+      1: alias
+      2: name
+      3: required
+      4: optional
+    })
+
+    log opt
+    this._opts.push({
+      
+    })
+
+    return this
+
+  renderHelpPage ()
+    const cf = new Colorfy()
+
+    if this._desc
+      cf.txt(this._desc).nl(2)
+
+    cf.lgrey('Usage: ').llgrey(this._usage || 'command [options]').nl(2)
+    cf.lgrey('Options: ').nl(2)
+
+    return cf.colorfy()
+
+  parse (argv)
+    console.log(this.renderHelpPage())

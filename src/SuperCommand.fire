@@ -39,7 +39,6 @@ export class SuperCommand
     return this
 
   renderHelpPage ()
-
     const cf = new Colorfy()
 
     if this._desc
@@ -69,7 +68,7 @@ export class SuperCommand
     )
 
   addDefaultOpts ()
-    this.option('-c, --no-color', 'Disable colorized output')
+    this.option('--no-color', 'Disable colorized output')
     this.option('--version', 'Print version')
 
   parseValue (value, type)

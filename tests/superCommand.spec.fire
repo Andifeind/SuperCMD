@@ -4,7 +4,7 @@ import SuperCommand from '../src/SuperCommand'
 describe('SuperCommand', () =>
   describe('camelCaseStr()', () =>
     it('returns a camelcased string', () =>
-      const sc = SuperCommand()
+      const sc = new SuperCommand()
       inspect(sc.camelCaseArg('foo-bar')).isEql('fooBar')
       inspect(sc.camelCaseArg('foo-bar-bla')).isEql('fooBarBla')
       inspect(sc.camelCaseArg('foo--bar---bla')).isEql('fooBarBla')
@@ -12,21 +12,72 @@ describe('SuperCommand', () =>
     )
   )
 
-  describe('parseArgument()', () =>
-    it('parse a boolean argument by its name', () =>
-      const args = []
-      const sc = SuperCommand()
-      sc.option('--foo', 'Test Command')
-      const res = sc.parseArgument(args, 'foo', 'bool')
-      inspect(res).isEql(['foo', true])
+  describe('parseArgv()', () =>
+    let sc
+
+    beforeEach(() =>
+      sc = new SuperCommand()
+      sc.option('--foo <str>', 'Test')
+      sc.option('-b, --bla', 'Test')
+      sc.option('--without-anything', 'Test')
     )
 
-    it('parse a boolean argument by its alias', () =>
-      const args = []
-      const sc = SuperCommand()
-      sc.option('-f, --foo', 'Test Command')
-      const res = sc.parseArgument(args, 'foo', 'bool')
-      inspect(res).isEql(['foo', false])
+    it('parse argv array', () =>
+      const argvArr = [
+        '/usr/local/bin/node',
+        'firetest',
+        '--foo',
+        'bar',
+        '-b'
+        '--without-anything'
+        'prop1',
+        'prop2'
+      ]
+
+      const args = sc.parseArgv(argvArr)
+      inspect(args).isEql({
+        _: '/usr/local/bin/node'
+        command: 'firetest'
+        foo: 'bar'
+        bla: true
+        withoutAnything: true
+        args: [ 'prop1', 'prop2' ]
+      })
+    )
+
+    it('parse argv array with an action', () =>
+      const argvArr = [
+        '/usr/local/bin/node',
+        'firetest',
+        'run',
+        '--foo',
+        'bar',
+        '-b'
+        '--without-anything'
+        'prop1',
+        'prop2'
+      ]
+
+      const args = sc.parseArgv(argvArr)
+      inspect(args).isEql({
+        _: '/usr/local/bin/node'
+        command: 'firetest'
+        action: 'run'
+        foo: 'bar'
+        bla: true
+        withoutAnything: true
+        args: [ 'prop1', 'prop2' ]
+      })
+    )
+
+    it('parse argv array with a missing value', () =>
+      const argvArr = [
+        '/usr/local/bin/node',
+        'firetest',
+        '--foo'
+      ]
+
+      inspect(sc.parseArgv).withArgsOn(sc, argvArr).doesThrow('Argument --foo expects a value')
     )
   )
 )

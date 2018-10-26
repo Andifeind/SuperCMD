@@ -28,7 +28,8 @@ export class SuperCommand
     this._opts.push({
       alias: opt.alias ? opt.alias.substr(1) : null
       name: opt.name.substr(2)
-      key: this.camelCaseStr(opt.name.substr(2))
+      type: opt.required || opt.optional || 'bool'
+      key: this.camelCaseArg(opt.name)
       required: opt.required ? true : false
       description: description
       defaultValue: defaultValue,
@@ -38,7 +39,6 @@ export class SuperCommand
     return this
 
   renderHelpPage ()
-    this.addDefaultOpts()
 
     const cf = new Colorfy()
 
@@ -59,55 +59,66 @@ export class SuperCommand
     return cf.colorfy()
 
   parse (argv)
+    this.addDefaultOpts()
     const args = this.parseArgv(argv)
     console.log(this.renderHelpPage())
 
-  camelCaseStr (str)
-    return str.replace(/-+\w/g, (match) =>
-      return match.toUpperCase()
+  camelCaseArg (str)
+    return str.replace(/^-+/, '').replace(/-+(\w)/g, (match, char) =>
+      return char.toUpperCase()
     )
 
   addDefaultOpts ()
     this.option('-c, --no-color', 'Disable colorized output')
     this.option('--version', 'Print version')
 
+  parseValue (value, type)
+    if type === 'num'
+      return Number(value)
+    elif type === 'list'
+      return value.split(/,/g)
+    else
+      return value
+
   parseArgv (argv)
-    log 'ARGV' argv
     const args =
       _: argv[0]
-      cmd: argv[1]
+      command: argv[1]
+      args: []
 
-    for i = 2; i < argv.length; i++
-      const key = argv[i]
-      if key.startWith('--')
-        const opt = this.getOption(key, 'name')
+    const actionReg = /^\w+(-\w)*$/
+    const argReg = /^-+\w+(-\w)*$/
+
+    let startIndex = 2
+    if actionReg.test(argv[2])
+      args.action = argv[2]
+      startIndex = 3
+
+    for i = startIndex; i < argv.length; i++
+      const arg = argv[i]
+      if arg.startsWith('-')
+        const key = this.camelCaseArg(argv[i])
+        const opt = this.getOption(key)
+
         if !opt
-          throw new Error('Undefined option ${key}')
-
-        if opt.type === 'bool'
+          throw new Error('Argument ${arg} is not a valid argument')
+        elif opt.type === 'bool'
           args[opt.key] = true
-        elif opt.type === 'str'
-          const val = argv[i]
-          if /^-\w|--[\w-]+$/.test(val)
-            throw new Error('Value expected!')
-          args[opt.key] = argv[i]
 
+        else
+          const nextArg = argv[i + 1]
+          if !nextArg || argReg.test(nextArg)
+            throw new Error('Argument ${arg} expects a value')
+          else
+            args[opt.key] = this.parseValue(nextArg, opt.type)
+            i += 1
+      else
+        args.args.push(arg)
 
-      elif key.startWith('-')
-        const opt = this.getOption(key, 'alias')
-        if !opt
-          throw new Error('Undefined option ${key}')
-
-        if opt.type === 'bool'
-          args[key] = true
-        elif opt.type === 'str'
-          const val = argv[i]
-          if /^-\w|--[\w-]+$/.test(val)
-            throw new Error('Value expected!')
-          args[key] = argv[i]
+    return args
 
 
   getOption (key, prop)
     return this._opts.find((item) =>
-      return item[prop] === key
+      return key.length === 1 ? item.alias === key : item.key === key
     )

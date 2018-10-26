@@ -1,8 +1,10 @@
 import Colorfy from 'colorfy'
+import * as Table from 'easy-table'
 
 export class SuperCommand
   constructor ()
-    this.optionRegExp = /(-\w|--[\w-]+)(?:,\s*(-\w|--[\w-]+))?(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
+    this.optionRegExp = /(?:(-\w),?\s*)?(--[\w-]+)(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
+    this._opts = []
 
   cwd (workingDir)
     this.workingDir = workingDir
@@ -16,22 +18,28 @@ export class SuperCommand
     return this
 
   option (option, description, defaultValue, fn)
-    this._opts.push([option, description, defaultValue, fn])
-    const opt = this.optionRegExp.capture({
-      1: alias
-      2: name
-      3: required
-      4: optional
+    const opt = this.optionRegExp.capture(option, {
+      1: 'alias'
+      2: 'name'
+      3: 'required'
+      4: 'optional'
     })
 
-    log opt
     this._opts.push({
-      
+      alias: opt.alias ? opt.alias.substr(1) : null
+      name: opt.name.substr(2)
+      key: this.camelCaseStr(opt.name.substr(2))
+      required: opt.required ? true : false
+      description: description
+      defaultValue: defaultValue,
+      fn: fn
     })
 
     return this
 
   renderHelpPage ()
+    this.addDefaultOpts()
+
     const cf = new Colorfy()
 
     if this._desc
@@ -40,7 +48,66 @@ export class SuperCommand
     cf.lgrey('Usage: ').llgrey(this._usage || 'command [options]').nl(2)
     cf.lgrey('Options: ').nl(2)
 
+    const table = new Table()
+    for opt of this._opts
+      const arg = opt.alias ? '-${opt.alias}, --${opt.name}' : '    --${opt.name}'
+      table.cell('Name', arg)
+      table.cell('Description', opt.description)
+      table.newRow()
+
+    cf.txt(table.print())
     return cf.colorfy()
 
   parse (argv)
+    const args = this.parseArgv(argv)
     console.log(this.renderHelpPage())
+
+  camelCaseStr (str)
+    return str.replace(/-+\w/g, (match) =>
+      return match.toUpperCase()
+    )
+
+  addDefaultOpts ()
+    this.option('-c, --no-color', 'Disable colorized output')
+    this.option('--version', 'Print version')
+
+  parseArgv (argv)
+    log 'ARGV' argv
+    const args =
+      _: argv[0]
+      cmd: argv[1]
+
+    for i = 2; i < argv.length; i++
+      const key = argv[i]
+      if key.startWith('--')
+        const opt = this.getOption(key, 'name')
+        if !opt
+          throw new Error('Undefined option ${key}')
+
+        if opt.type === 'bool'
+          args[opt.key] = true
+        elif opt.type === 'str'
+          const val = argv[i]
+          if /^-\w|--[\w-]+$/.test(val)
+            throw new Error('Value expected!')
+          args[opt.key] = argv[i]
+
+
+      elif key.startWith('-')
+        const opt = this.getOption(key, 'alias')
+        if !opt
+          throw new Error('Undefined option ${key}')
+
+        if opt.type === 'bool'
+          args[key] = true
+        elif opt.type === 'str'
+          const val = argv[i]
+          if /^-\w|--[\w-]+$/.test(val)
+            throw new Error('Value expected!')
+          args[key] = argv[i]
+
+
+  getOption (key, prop)
+    return this._opts.find((item) =>
+      return item[prop] === key
+    )

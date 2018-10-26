@@ -1,0 +1,32 @@
+import * as inspect from 'inspect.js'
+import SuperCommand from '../src/SuperCommand'
+
+describe('SuperCommand', () =>
+  describe('camelCaseStr()', () =>
+    it('returns a camelcased string', () =>
+      const sc = SuperCommand()
+      inspect(sc.camelCaseArg('foo-bar')).isEql('fooBar')
+      inspect(sc.camelCaseArg('foo-bar-bla')).isEql('fooBarBla')
+      inspect(sc.camelCaseArg('foo--bar---bla')).isEql('fooBarBla')
+      inspect(sc.camelCaseArg('--foo-bar-bla')).isEql('fooBarBla')
+    )
+  )
+
+  describe('parseArgument()', () =>
+    it('parse a boolean argument by its name', () =>
+      const args = []
+      const sc = SuperCommand()
+      sc.option('--foo', 'Test Command')
+      const res = sc.parseArgument(args, 'foo', 'bool')
+      inspect(res).isEql(['foo', true])
+    )
+
+    it('parse a boolean argument by its alias', () =>
+      const args = []
+      const sc = SuperCommand()
+      sc.option('-f, --foo', 'Test Command')
+      const res = sc.parseArgument(args, 'foo', 'bool')
+      inspect(res).isEql(['foo', false])
+    )
+  )
+)

@@ -80,4 +80,21 @@ describe('SuperCommand', () =>
       inspect(sc.parseArgv).withArgsOn(sc, argvArr).doesThrow('Argument --foo expects a value')
     )
   )
+
+  describe('parseCommand()', () =>
+    it('parse a command', () =>
+      const sc = new SuperCommand()
+      const cmd = sc.parseCommand('foo <str> [str]')
+      inspect(cmd).isEql({
+        command: 'foo'
+        args: [{
+          type: 'str'
+          required: true
+        }, {
+          type: 'str'
+          required: false
+        }]
+      })
+    )
+  )
 )

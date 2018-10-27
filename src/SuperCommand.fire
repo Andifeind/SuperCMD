@@ -4,6 +4,7 @@ import * as Table from 'easy-table'
 export class SuperCommand
   constructor ()
     this.optionRegExp = /(?:(-\w),?\s*)?(--[\w-]+)(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
+    this.commandRegExp = /([\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
     this._opts = []
 
   cwd (workingDir)
@@ -21,8 +22,8 @@ export class SuperCommand
     const opt = this.optionRegExp.capture(option, {
       1: 'alias'
       2: 'name'
-      3: 'required'
-      4: 'optional'
+      3: 'optional'
+      4: 'required'
     })
 
     this._opts.push({
@@ -37,6 +38,12 @@ export class SuperCommand
     })
 
     return this
+
+  action (fn)
+    this._actionFn = fn
+
+  cmd (cmd)
+    this._cmd = this.parseCommand(cmd)
 
   renderHelpPage ()
     const cf = new Colorfy()
@@ -103,7 +110,6 @@ export class SuperCommand
           throw new Error('Argument ${arg} is not a valid argument')
         elif opt.type === 'bool'
           args[opt.key] = true
-
         else
           const nextArg = argv[i + 1]
           if !nextArg || argReg.test(nextArg)
@@ -116,8 +122,29 @@ export class SuperCommand
 
     return args
 
-
   getOption (key, prop)
     return this._opts.find((item) =>
       return key.length === 1 ? item.alias === key : item.key === key
     )
+
+  parseCommand (cmdStr)
+    const caps = this.commandRegExp.capture(cmdStr, {
+      1: 'command'
+      2: 'optional'
+      3: 'required'
+    })
+
+    const cmd = {}
+
+    if caps[0].command
+      cmd.command = caps[0].command
+      caps.shift()
+
+    cmd.args = caps.map((item) =>
+      return {
+        type: item.required || item.optional
+        required: !!item.required
+      }
+    )
+
+    return cmd

@@ -96,5 +96,29 @@ describe('SuperCommand', () =>
         }]
       })
     )
+
+    it('parse a default command', () =>
+      const sc = new SuperCommand()
+      const cmd = sc.parseCommand('* <str> [str]')
+      inspect(cmd).isEql({
+        command: '*'
+        args: [{
+          type: 'str'
+          required: true
+        }, {
+          type: 'str'
+          required: false
+        }]
+      })
+    )
+
+    it('parse a default command', () =>
+      const sc = new SuperCommand()
+      const cmd = sc.parseCommand('bla')
+      inspect(cmd).isEql({
+        command: 'bla'
+        args: []
+      })
+    )
   )
 )

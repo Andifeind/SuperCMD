@@ -4,7 +4,7 @@ import * as Table from 'easy-table'
 export class SuperCommand
   constructor ()
     this.optionRegExp = /(?:(-\w),?\s*)?(--[\w-]+)(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
-    this.commandRegExp = /([\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
+    this.commandRegExp = /(\*|[\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
     this._opts = []
 
   cwd (workingDir)

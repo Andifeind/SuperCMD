@@ -85,9 +85,9 @@ describe('SuperCommand', () =>
     it('parse a command', () =>
       const sc = new SuperCommand()
       const cmd = sc.parseCommand('foo <str> [str]')
-      inspect(cmd).isEql({
-        command: 'foo'
-        args: [{
+      inspect(sc).hasProps({
+        _action: 'foo'
+        _cmdArgs: [{
           type: 'str'
           required: true
         }, {
@@ -100,9 +100,9 @@ describe('SuperCommand', () =>
     it('parse a default command', () =>
       const sc = new SuperCommand()
       const cmd = sc.parseCommand('* <str> [str]')
-      inspect(cmd).isEql({
-        command: '*'
-        args: [{
+      inspect(sc).hasProps({
+        _action: '*'
+        _cmdArgs: [{
           type: 'str'
           required: true
         }, {
@@ -115,9 +115,9 @@ describe('SuperCommand', () =>
     it('parse a default command', () =>
       const sc = new SuperCommand()
       const cmd = sc.parseCommand('bla')
-      inspect(cmd).isEql({
-        command: 'bla'
-        args: []
+      inspect(sc).hasProps({
+        _action: 'bla'
+        _cmdArgs: []
       })
     )
   )

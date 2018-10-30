@@ -6,6 +6,7 @@ export class SuperCommand
     this.optionRegExp = /(?:(-\w),?\s*)?(--[\w-]+)(?:\s*\[(\w+)\])?(?:\s*\<(\w+)\>)?/
     this.commandRegExp = /(\*|[\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
     this._opts = []
+    this._cmd = {}
 
   cwd (workingDir)
     this.workingDir = workingDir
@@ -41,9 +42,14 @@ export class SuperCommand
 
   action (fn)
     this._actionFn = fn
+    return this
 
   cmd (cmd)
-    this._cmd = this.parseCommand(cmd)
+    const subcommand = new SuperCommand()
+    subcommand.parseCommand(cmd)
+
+    this._cmd[subcommand._action] = subcommand
+    return subcommand
 
   renderHelpPage ()
     const cf = new Colorfy()
@@ -67,7 +73,21 @@ export class SuperCommand
   parse (argv)
     this.addDefaultOpts()
     const args = this.parseArgv(argv)
-    console.log(this.renderHelpPage())
+    # log 'ARGS' args
+
+    if args.action === this._action || (!args.action && this._action === '*')
+      log 'TODO: Handle subcommand'
+    elif this._cmd['*']
+      this._cmd['*'].callAction(args)
+
+  callAction (args)
+    const ctx = {
+      command: this._
+    }
+
+    const fnArgs = [args]
+
+    this._actionFn.apply(this, fnArgs)
 
   camelCaseArg (str)
     return str.replace(/^-+/, '').replace(/-+(\w)/g, (match, char) =>
@@ -134,17 +154,15 @@ export class SuperCommand
       3: 'required'
     })
 
-    const cmd = {}
-
     if caps[0].command
-      cmd.command = caps[0].command
+      this._action = caps[0].command
       caps.shift()
 
-    cmd.args = caps.map((item) =>
+    this._cmdArgs = caps.map((item) =>
       return {
         type: item.required || item.optional
         required: !!item.required
       }
     )
 
-    return cmd
+    return this

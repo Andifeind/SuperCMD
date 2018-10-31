@@ -7,6 +7,7 @@ export class SuperCommand
     this.commandRegExp = /(\*|[\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
     this._opts = []
     this._cmd = {}
+    this._lastCmd = null
 
   cwd (workingDir)
     this.workingDir = workingDir
@@ -49,6 +50,7 @@ export class SuperCommand
     subcommand.parseCommand(cmd)
 
     this._cmd[subcommand._action] = subcommand
+    this._lastCmd = subcommand._action
     return subcommand
 
   renderHelpPage ()
@@ -79,6 +81,11 @@ export class SuperCommand
       log 'TODO: Handle subcommand'
     elif this._cmd['*']
       this._cmd['*'].callAction(args)
+    elif this.isLastCommand
+      log 'Throw command not found'
+
+  get isLastCommand ()
+    return this._action === this.parent._lastCmd
 
   callAction (args)
     const ctx = {
@@ -88,6 +95,7 @@ export class SuperCommand
     const fnArgs = [args]
 
     this._actionFn.apply(this, fnArgs)
+
 
   camelCaseArg (str)
     return str.replace(/^-+/, '').replace(/-+(\w)/g, (match, char) =>

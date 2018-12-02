@@ -1,6 +1,7 @@
 image: node:8
 stages:
   - test
+  - build
   - publish
 
 .test: &test
@@ -21,10 +22,20 @@ Test Node 10:
   image: node:10
   <<: *test
 
+Build:
+  stage: build
+  # only:
+  #   - tags
+  before_script:
+    - npm i -g firescript
+  script:
+    - fire build
+
 Publish:
   stage: publish
   only:
     - tags
   script:
+    - cd dist/
     - echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc
     - npm publish

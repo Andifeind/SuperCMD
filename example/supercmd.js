@@ -8,7 +8,6 @@ supercmd
     console.log('Action: cmdtest')
     console.log('CTX', ctx)
   })
-  .parse(process.argv)
 
 supercmd
   .cmd('foo <str>')
@@ -18,7 +17,6 @@ supercmd
     console.log('Action: foo', bar)
     console.log('CTX', ctx)
   })
-  .parse(process.argv)
 
 supercmd
   .cmd('*')
@@ -28,4 +26,12 @@ supercmd
     console.log('Action: default', bar)
     console.log('CTX', ctx)
   })
-  .parse(process.argv)
+
+supercmd
+  .cmd('commands')
+  .description('Shows all commands')
+  .action(() => {
+    supercmd.printCommandsList()
+  })
+
+supercmd.parse(process.argv)

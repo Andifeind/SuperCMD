@@ -7,7 +7,6 @@ export class SuperCommand
     this.commandRegExp = /(\*|[\w-]+)|(?:\s*\[(\w+)\])|(?:\s*\<(\w+)\>)/g
     this._opts = []
     this._cmd = {}
-    this._lastCmd = null
 
   cwd (workingDir)
     this.workingDir = workingDir
@@ -50,7 +49,6 @@ export class SuperCommand
     subcommand.parseCommand(cmd)
 
     this._cmd[subcommand._action] = subcommand
-    this._lastCmd = subcommand._action
     return subcommand
 
   renderHelpPage ()
@@ -76,16 +74,18 @@ export class SuperCommand
     this.addDefaultOpts()
     const args = this.parseArgv(argv)
     # log 'ARGS' args
+    log 'ACTION' args.action this._action
 
-    if args.action === this._action || (!args.action && this._action === '*')
-      log 'TODO: Handle subcommand'
+    if args.action
+      const cmd = this._cmd[args.action]
+      if !cmd
+        throw new Error('Subcommand ${args.actiion} not found!')
+
+      cmd.callAction(args)
     elif this._cmd['*']
       this._cmd['*'].callAction(args)
-    elif this.isLastCommand
-      log 'Throw command not found'
-
-  get isLastCommand ()
-    return this._action === this.parent._lastCmd
+    else
+      this.printCommandsList()
 
   callAction (args)
     const ctx = {
@@ -174,3 +174,34 @@ export class SuperCommand
     )
 
     return this
+
+  printCommandsList ()
+    let longest = 0
+    const commandKeys = Object
+      .keys(this._cmd)
+      .filter((key) =>
+        return !['*', 'commands'].includes(key)
+      )
+      .sort()
+
+    const commands = commandKeys.map((key) =>
+      const cmd = this._cmd[key]
+      longest = Math.max(longest, cmd._action.length)
+      const res =
+        action: cmd._action
+        description: cmd._desc
+
+      return res
+    )
+
+    const cf = new Colorfy()
+    cf.txt('Commands:').nl()
+    commands.forEach((c) =>
+      cf
+        .yellow(c.action)
+        .txt(' '.repeat(longest - c.action.length + 2))
+        .lgrey(c.description)
+        .nl()
+    )
+
+    cf.print()

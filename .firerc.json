@@ -1,0 +1,12 @@
+{
+  "src": "./src",
+  "dest": "./dist/",
+  "features": {
+    "esModules": false,
+    "esClasses": true
+  },
+  "copy": [
+    "$ROOT/package.json",
+    "$ROOT/README.md"
+  ]
+}

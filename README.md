@@ -6,16 +6,33 @@ SuperCommand is a framework to build command-line interfaces in node.js.
 ## Usage
 
 ```js
-import cmd from 'supercmd'
+import supercmd from 'supercmd'
 
-cmd
-  .usage('myapp [options]')
+supercmd
+  .cmd('myapp [options]')
   .description('Runs MyApp in current working dir')
+  .action((ctx) => {
+    // place command's code here
+  })
 
 ```
 
-
 ## API
+
+### .cmd(*str* command)
+
+Register a subcommand. A subcommand can take 0 - n arguments.
+
+Wrap optional arguments in `[` and `]` and required arguments in `<` and `>`.
+
+Example: `mycommand <infile> [outfile]`  
+This would register a command `mycommand` with a required argument `infile` and one optinal argument called `outfile`. The action method will be called with the arguments as second and third params.
+
+```js
+.action((ctx, infile, outfile) => {
+
+})
+```
 
 ### .cwd(*str* workingDir)
 Set a working dir
@@ -27,7 +44,7 @@ Describe what a program is for and what is does, show in the help page
 
 Register an option parameter. The `param` argument describes the parameter name, alias, value und value type. The syntax is `[alias] [name] [value]`.
 
-Alias is an one char long shortcut of the parameter and it is prefixed by on minus. Example: `-f`.  
+Alias is an one char long shortcut of the parameter and it is prefixed by one minus char. Example: `-f`.  
 Name is a parameter name. It is prefixed by two minus and its the only required part. A parameter can contain chars, numbers and a minus. Example: `--foo, --foo-bar`.
 The third part describes the parameter value and if it is a mandatory parameter or not. The default type is `bool`.
 The type must be enclosed by either angel bracets or square bracets.

@@ -121,4 +121,43 @@ describe('SuperCommand', () =>
       })
     )
   )
+
+  describe('parse()', () =>
+    let sc
+
+    beforeEach(() =>
+      sc = new SuperCommand()
+      sc.option('--foo', 'Test')
+      sc.option('-b, --bla', 'Test')
+      sc.option('--without-anything', 'Test')
+    )
+
+    it('calls a default action', (done) =>
+      sc.action((ctx, ...args) =>
+        inspect(ctx).isObject()
+        inspect(ctx).hasProps({
+          foo: true
+          bla: true
+        })
+
+        inspect(args).isArray()
+        inspect(args).isEql([
+          'prop1'
+          'prop2'
+        ])
+        done()
+      )
+
+      const callArgs = sc.parseArgv([
+        '/usr/local/bin/node',
+        'firetest',
+        '--foo',
+        '-b'
+        'prop1',
+        'prop2'
+      ])
+
+      sc.callAction(callArgs)
+    )
+  )
 )

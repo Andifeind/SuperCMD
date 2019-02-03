@@ -73,7 +73,6 @@ export class SuperCommand
   parse (argv)
     this.addDefaultOpts()
     const args = this.parseArgv(argv)
-    # log 'ARGS' args
     # log 'ACTION' args.action this._action
 
     if args.action
@@ -89,10 +88,11 @@ export class SuperCommand
 
   callAction (args)
     const ctx = {
-      command: this._
+      command: args.command
+      action: args.action || 'default'
     }
 
-    const fnArgs = [args]
+    const fnArgs = [args].concat(args.args)
 
     this._actionFn.apply(this, fnArgs)
 

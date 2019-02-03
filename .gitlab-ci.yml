@@ -30,7 +30,7 @@ Build:
   stage: build
   only:
     - /^v\d+\.d+\.¸d+$/
-  exept:
+  except:
     - branches
   before_script:
     - npm i -g firescript
@@ -41,7 +41,7 @@ Publish:
   stage: publish
   only:
     - /^v\d+\.d+\.¸d+$/
-  exept:
+  except:
     - branches
   script:
     - cd dist/

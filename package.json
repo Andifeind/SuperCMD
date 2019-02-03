@@ -1,6 +1,6 @@
 {
   "name": "supercmd",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Super Command is a comandline toolkit to build CLI comands.",
   "main": "app.js",
   "scripts": {

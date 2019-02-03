@@ -21,7 +21,7 @@
   "author": "Andi Heinkelein <andifeind@noname-media.com>",
   "license": "MIT",
   "devDependencies": {
-    "firescript": "^0.7.1"
+    "firescript": "^0.8.2"
   },
   "dependencies": {
     "colorfy": "^2.0.4",

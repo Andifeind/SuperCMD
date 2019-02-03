@@ -28,8 +28,8 @@ Test Node 11:
 
 Build:
   stage: build
-  # only:
-  #   - tags
+  only:
+    - tags
   before_script:
     - npm i -g firescript
   script:

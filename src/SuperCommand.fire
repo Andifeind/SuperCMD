@@ -74,12 +74,12 @@ export class SuperCommand
     this.addDefaultOpts()
     const args = this.parseArgv(argv)
     # log 'ARGS' args
-    log 'ACTION' args.action this._action
+    # log 'ACTION' args.action this._action
 
     if args.action
       const cmd = this._cmd[args.action]
       if !cmd
-        throw new Error('Subcommand ${args.actiion} not found!')
+        throw new Error('Subcommand ${args.action} not found!')
 
       cmd.callAction(args)
     elif this._cmd['*']

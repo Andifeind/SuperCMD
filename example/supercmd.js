@@ -4,7 +4,7 @@ supercmd
   .cmd('cmdtest [options]')
   .description('Shows a SuperCommand description')
   .option('-n, --name <str>', 'Add a name')
-  .action(() => {
+  .action((ctx) => {
     console.log('Action: cmdtest')
     console.log('CTX', ctx)
   })

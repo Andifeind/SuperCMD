@@ -29,7 +29,9 @@ Test Node 11:
 Build:
   stage: build
   only:
-    - tags
+    - /^v\d+\.d+\.¸d+$/
+  exept:
+    - branches
   before_script:
     - npm i -g firescript
   script:
@@ -38,7 +40,9 @@ Build:
 Publish:
   stage: publish
   only:
-    - tags
+    - /^v\d+\.d+\.¸d+$/
+  exept:
+    - branches
   script:
     - cd dist/
     - echo "//registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN" >> ~/.npmrc

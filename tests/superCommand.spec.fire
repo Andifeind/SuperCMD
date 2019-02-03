@@ -159,5 +159,35 @@ describe('SuperCommand', () =>
 
       sc.callAction(callArgs)
     )
+
+    it('calls an action', (done) =>
+      sc.action((ctx, ...args) =>
+        inspect(ctx).isObject()
+        inspect(ctx).hasProps({
+          action: 'test'
+          foo: true
+          bla: true
+        })
+
+        inspect(args).isArray()
+        inspect(args).isEql([
+          'prop1'
+          'prop2'
+        ])
+        done()
+      )
+
+      const callArgs = sc.parseArgv([
+        '/usr/local/bin/node',
+        'firetest',
+        'test',
+        '--foo',
+        '-b'
+        'prop1',
+        'prop2'
+      ])
+
+      sc.callAction(callArgs)
+    )
   )
 )

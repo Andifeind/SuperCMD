@@ -22,6 +22,10 @@ Test Node 10:
   image: node:10
   <<: *test
 
+Test Node 11:
+  image: node:11
+  <<: *test
+
 Build:
   stage: build
   # only:

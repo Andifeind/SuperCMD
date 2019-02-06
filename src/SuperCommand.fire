@@ -71,9 +71,9 @@ export class SuperCommand
     return cf.colorfy()
 
   parse (argv)
-    this.addDefaultOpts()
     const args = this.parseArgv(argv)
-    # log 'ACTION' args.action this._action
+
+    this.addDefaultOpts()
 
     if args.action
       const cmd = this._cmd[args.action]
@@ -128,11 +128,13 @@ export class SuperCommand
       args.action = argv[2]
       startIndex = 3
 
+    const cmd = args.action ? this._cmd[args.action] : this
+
     for i = startIndex; i < argv.length; i++
       const arg = argv[i]
       if arg.startsWith('-')
         const key = this.camelCaseArg(argv[i])
-        const opt = this.getOption(key)
+        const opt = cmd.getOption(key)
 
         if !opt
           throw new Error('Argument ${arg} is not a valid argument')

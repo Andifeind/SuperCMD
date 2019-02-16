@@ -20,6 +20,11 @@ describe('SuperCommand', () =>
       sc.option('--foo <str>', 'Test')
       sc.option('-b, --bla', 'Test')
       sc.option('--without-anything', 'Test')
+
+      sc.cmd('run')
+        .option('--foo <str>', 'Test')
+        .option('-b, --bla', 'Test')
+        .option('--without-anything', 'Test')
     )
 
     it('parse argv array', () =>
@@ -130,6 +135,11 @@ describe('SuperCommand', () =>
       sc.option('--foo', 'Test')
       sc.option('-b, --bla', 'Test')
       sc.option('--without-anything', 'Test')
+
+      sc.cmd('test')
+        .option('--foo', 'Test')
+        .option('-b, --bla', 'Test')
+        .option('--without-anything', 'Test')
     )
 
     it('calls a default action', (done) =>

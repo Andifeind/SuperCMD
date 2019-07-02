@@ -128,7 +128,7 @@ export class SuperCommand
       args.action = argv[2]
       startIndex = 3
 
-    const cmd = args.action ? this._cmd[args.action] : this
+    const cmd = args.action ? this._cmd[args.action] : this._cmd['*'] || this
 
     for i = startIndex; i < argv.length; i++
       const arg = argv[i]
